@@ -45,7 +45,7 @@ class Validator implements Validatable
   public function __construct()
   {
     $this->rules = [
-      'name' => v::stringType()->notBlank()->length($this->minStringLength, $this->minStringLength),
+      'name' => v::notBlank()->stringType()->length($this->minStringLength, $this->maxStringLength),
       'email' => v::stringType()->notBlank()->email()->length($this->minStringLength, $this->maxStringLength),
       'phone' => v::stringType()->notBlank()->phone(),
       'text' => v::stringType()->length($this->minStringLength, $this->maxTextLength)
