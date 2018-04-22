@@ -1,0 +1,4 @@
+/vendor/
+/database/
+/.idea/
+.DS_Store
