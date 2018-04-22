@@ -8,45 +8,17 @@
 
 require_once realpath(__DIR__ . "/../bootstrap/bootstrap.php");
 
-use App\Models\Registration;
-use App\Utilities\Validation\RegistrationValidator as Validator;
-use League\Csv\Reader;
+use App\Utilities\Import\CSVReader as Reader;
+use App\Utilities\Import\Registration\ImportStrategy;
 
-$registrations = [];
 $filePath = realpath(__DIR__ . "/../import/data.csv");
-$validator = new Validator();
+$reader = new Reader($filePath);
 
 try {
-  $records = Reader::createFromPath($filePath, 'r')->setDelimiter(';')->jsonSerialize();
-
-  foreach ($records as $record) {
-    $registration = new Registration(...$record);
-
-    if (!$validator->validate($registration)) {
-      dump($registration);
-      dump("Invalid import format.");
-      $entityManager->rollback();
-      exit(0);
-    }
-
-    $dbRecord = $entityManager->getRepository(Registration::class)
-      ->findOneBy(['email' => $registration->getEmail()]);
-
-    if ($dbRecord) {
-      $dbRecord->setFirstName($registration->getFirstName());
-      $dbRecord->setLastName($registration->getLastName());
-      $dbRecord->setFirstPhoneNumber($registration->getFirstPhoneNumber());
-      $dbRecord->setSecondPhoneNumber($registration->getSecondPhoneNumber());
-      $dbRecord->setComment($registration->getComment());
-    } else {
-      $entityManager->persist($registration);
-    }
-
-    array_push($registrations, $dbRecord ? $dbRecord : $registration);
-  }
-
-  $entityManager->flush();
+  $records = $reader->read()->getRecords();
+  $strategy = new ImportStrategy($records, $entityManager);
+  $strategy->import();
   dump("Import finished.");
-
 } catch (\Exception $e) {
+  dump($e->getMessage());
 }
