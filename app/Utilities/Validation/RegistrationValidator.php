@@ -32,7 +32,6 @@ class RegistrationValidator extends Validator
    */
   public function validate($item): bool
   {
-    dump($this->validator);
     return $this->validator->validate($item);
   }
 }
