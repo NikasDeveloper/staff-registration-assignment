@@ -170,7 +170,7 @@ class Registration
   }
 
   /**
-   * @param string $secondPhoneNumber
+   * @param string|null $secondPhoneNumber
    */
   public function setSecondPhoneNumber(string $secondPhoneNumber)
   {
@@ -186,9 +186,9 @@ class Registration
   }
 
   /**
-   * @param string $comment
+   * @param string|null $comment
    */
-  public function setComment(string $comment): void
+  public function setComment($comment): void
   {
     $comment = trim($comment);
     $this->comment = strlen($comment) > 1024 ? substr($comment, 0, 1021) . "..." : $comment;
